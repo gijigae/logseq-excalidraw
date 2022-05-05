@@ -1,22 +1,18 @@
 import '@logseq/libs';
 
-//Inputs 5 numbered blocks when called
-async function insertSomeBlocks (e) {
+//Embed Excalidraw when called
+async function insertExclidraw (e) {
   console.log('Open the calendar!')
-  let numberArray = [1, 2, 3, 4, 5]
-  for (const number in numberArray){
-  logseq.App.showMsg("Function has been run")
-  logseq.Editor.insertBlock(e.uuid, `This is block ${numberArray[number]}`, {sibling: true})}
-
-  }
+  const room = Array.from(window.crypto.getRandomValues(new Uint8Array(10))).map((byte) => `0${byte.toString(16)}`.slice(-2)).join("");
+  const key = (await window.crypto.subtle.exportKey("jwk",await window.crypto.subtle.generateKey({name:"AES-GCM",length:128},true,["encrypt", "decrypt"]))).k;
   
-
+  logseq.Editor.insertBlock(e.uuid, `<iframe src="https://excalidraw.com/#room=${room},${key}" scrolling="YES" style="width: 100%; height: 700px"></iframe>`, {sibling: true})
+}
+  
 const main = async () => {
-  console.log('plugin loaded');
-  logseq.Editor.registerSlashCommand('insertBlocks', async (e) => {
-    insertSomeBlocks(e)
-  }
-    
-  )}
+  logseq.Editor.registerSlashCommand('Insert Excalidraw', async (e) => {
+    insertExclidraw(e)
+  }    
+)}
 
 logseq.ready(main).catch(console.error);
